@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tushar</title>
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: #000;
+    overflow: hidden;
+  }
+  canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+const RAIN_SOURCE = "TusharTUSHAR0123456789";
+const CHARS = RAIN_SOURCE.split('');
+
+let cols, drops, fontSize;
+
+function setup() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  fontSize = 15; // smaller = denser columns
+  cols = Math.floor(canvas.width / fontSize);
+  drops = new Array(cols).fill(0).map(() => ({
+    y: Math.random() * -canvas.height,
+    speed: 1.0 + Math.random() * 1.8,   // faster overall
+    charOffset: Math.floor(Math.random() * CHARS.length)
+  }));
+}
+setup();
+window.addEventListener('resize', setup);
+
+function drawRain() {
+  // shorter fade = longer, denser-looking trails
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.10)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = `${fontSize}px "Courier New", monospace`;
+
+  for (let i = 0; i < cols; i++) {
+    const d = drops[i];
+    const x = i * fontSize + fontSize / 2;
+
+    const ch = CHARS[(Math.floor(d.y / fontSize) + d.charOffset) % CHARS.length];
+
+    ctx.shadowColor = 'rgba(255, 160, 200, 0.9)';
+    ctx.shadowBlur = 8;
+    ctx.fillStyle = '#ffe3f0';
+    ctx.fillText(ch, x, d.y);
+
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(245, 120, 170, 0.55)';
+    ctx.fillText(
+      CHARS[(Math.floor((d.y - fontSize) / fontSize) + d.charOffset + CHARS.length) % CHARS.length],
+      x, d.y - fontSize
+    );
+
+    d.y += d.speed * fontSize * 0.06 * 6;
+    if (d.y > canvas.height + fontSize && Math.random() < 0.03) {
+      d.y = Math.random() * -200;
+      d.speed = 1.0 + Math.random() * 1.8;
+    }
+  }
+}
+
+// ---- Sequential center word cycle ----
+const WORDS = ["I", "Love", "You", "Tushar"];
+const SLOT_MS = 500;   // each word gets 10 seconds total
+const FADE_IN_MS = 900;
+const FADE_OUT_MS = 1400;
+
+let startTime = 300;
+
+function centerAlpha(elapsed) {
+  if (elapsed < FADE_IN_MS) return elapsed / FADE_IN_MS;
+  if (elapsed > SLOT_MS - FADE_OUT_MS) {
+    return Math.max(0, (SLOT_MS - elapsed) / FADE_OUT_MS);
+  }
+  return 1;
+}
+
+function drawCenterWord(timestamp) {
+  if (startTime === null) startTime = timestamp;
+  const totalElapsed = timestamp - startTime;
+  const wordIndex = Math.floor(totalElapsed / SLOT_MS) % WORDS.length;
+  const elapsedInSlot = totalElapsed % SLOT_MS;
+  const alpha = centerAlpha(elapsedInSlot);
+  const word = WORDS[wordIndex];
+
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+  const size = Math.min(canvas.width, canvas.height) * 0.16;
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = `700 ${size}px "Times New Roman"`;
+  ctx.shadowColor = `rgba(255, 140, 190, ${alpha})`;
+  ctx.shadowBlur = 30;
+  ctx.fillStyle = `rgba(255, 214, 232, ${alpha})`;
+  ctx.fillText(word, cx, cy);
+  ctx.shadowBlur = 0;
+}
+
+function loop(timestamp) {
+  drawRain();
+  drawCenterWord(timestamp);
+  requestAnimationFrame(loop);
+}
+
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
