@@ -32,7 +32,7 @@ function setup() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  fontSize = 15; // smaller = denser columns
+  fontSize = 10; // 
   cols = Math.floor(canvas.width / fontSize);
   drops = new Array(cols).fill(0).map(() => ({
     y: Math.random() * -canvas.height,
@@ -45,7 +45,7 @@ window.addEventListener('resize', setup);
 
 function drawRain() {
   // shorter fade = longer, denser-looking trails
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.10)';
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.textAlign = 'center';
