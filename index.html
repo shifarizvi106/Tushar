@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tushar </title>
+    <title> Tushar </title>
     <style>
         * {
             margin: 0;
@@ -65,14 +65,14 @@
             z-index: 0;
             pointer-events: none;
         }
-        /* ASCII filter container */
+        /* ASCII filter container - now with better visibility */
         .ascii-filter-container {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 1;
+            z-index: 2;
             pointer-events: none;
         }
         .ascii-filter-container canvas {
@@ -87,13 +87,27 @@
             position: absolute;
             left: 0;
             top: 0;
-            background-image: radial-gradient(circle, #ff6188 0%, #fc9867 50%, #ffd866 100%);
-            background-attachment: fixed;
-            -webkit-text-fill-color: transparent;
-            -webkit-background-clip: text;
             z-index: 9;
-            mix-blend-mode: difference;
             pointer-events: none;
+            /* Brighter, more readable text */
+            color: #ff69b4;
+            text-shadow: 
+                0 0 10px #ff69b4,
+                0 0 20px #ff1493,
+                0 0 40px #ff1493,
+                0 0 80px #ff1493;
+            font-weight: bold;
+            opacity: 1;
+            background: transparent;
+            -webkit-text-fill-color: #ff69b4;
+            -webkit-background-clip: unset;
+            background-image: none;
+            mix-blend-mode: normal;
+        }
+        /* Make ASCII text brighter */
+        .ascii-filter-container pre .highlight {
+            color: #ff8cba;
+            text-shadow: 0 0 20px #ff69b4, 0 0 40px #ff1493;
         }
     </style>
 </head>
@@ -139,7 +153,8 @@
             }
 
             animate() {
-                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                // Darker background for better contrast
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
                 this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
                 for (let i = 0; i < this.drops.length; i++) {
@@ -147,24 +162,24 @@
                     const x = i * this.fontSize;
                     const y = this.drops[i] * this.fontSize;
 
-                    // Pink gradient
+                    // Brighter pink colors for better visibility
                     const gradient = this.ctx.createRadialGradient(x, y, 0, x, y, this.fontSize);
                     const pink = Math.random();
-                    if (pink > 0.7) {
+                    if (pink > 0.8) {
+                        gradient.addColorStop(0, '#ff1493');
+                        gradient.addColorStop(1, '#ff69b4');
+                    } else if (pink > 0.5) {
                         gradient.addColorStop(0, '#ff69b4');
-                        gradient.addColorStop(1, '#ff1493');
-                    } else if (pink > 0.4) {
-                        gradient.addColorStop(0, '#ff8cba');
-                        gradient.addColorStop(1, '#ff69b4');
+                        gradient.addColorStop(1, '#ff8cba');
                     } else {
-                        gradient.addColorStop(0, '#ffb6c1');
-                        gradient.addColorStop(1, '#ff69b4');
+                        gradient.addColorStop(0, '#ff8cba');
+                        gradient.addColorStop(1, '#ffb6c1');
                     }
 
                     this.ctx.fillStyle = gradient;
                     this.ctx.font = `${this.fontSize}px 'IBM Plex Mono', monospace`;
-                    this.ctx.shadowBlur = 15;
-                    this.ctx.shadowColor = 'rgba(255, 105, 180, 0.5)';
+                    this.ctx.shadowBlur = 10;
+                    this.ctx.shadowColor = 'rgba(255, 105, 180, 0.3)';
                     this.ctx.fillText(char, x, y);
 
                     if (y > this.canvas.height && Math.random() > 0.975) {
@@ -212,7 +227,7 @@
         `;
 
         // ============================================================
-        //  FRAGMENT SHADER
+        //  FRAGMENT SHADER - Made brighter
         // ============================================================
         const fragmentShader = `
             varying vec2 vUv;
@@ -227,12 +242,18 @@
                 float g = texture2D(uTexture, pos + tan(time * .5 + pos.x - time) * .01).g;
                 float b = texture2D(uTexture, pos - cos(time * 2. + time + pos.y) * .01).b;
                 float a = texture2D(uTexture, pos).a;
-                gl_FragColor = vec4(r, g, b, a);
+                // Boost brightness and contrast
+                vec4 color = vec4(r, g, b, a);
+                color.rgb = color.rgb * 1.5;
+                color.r = min(color.r, 1.0);
+                color.g = min(color.g, 1.0);
+                color.b = min(color.b, 1.0);
+                gl_FragColor = color;
             }
         `;
 
         // ============================================================
-        //  ASCII FILTER
+        //  ASCII FILTER - Improved for readability
         // ============================================================
         const PX_RATIO = window.devicePixelRatio || 1;
 
@@ -246,10 +267,15 @@
                 this.domElement.style.left = '0';
                 this.domElement.style.width = '100%';
                 this.domElement.style.height = '100%';
-                this.domElement.style.zIndex = '1';
+                this.domElement.style.zIndex = '2';
                 this.domElement.style.pointerEvents = 'none';
 
                 this.pre = document.createElement('pre');
+                this.pre.style.color = '#ff69b4';
+                this.pre.style.textShadow = '0 0 10px #ff69b4, 0 0 20px #ff1493, 0 0 40px #ff1493';
+                this.pre.style.fontWeight = 'bold';
+                this.pre.style.background = 'transparent';
+                this.pre.style.mixBlendMode = 'normal';
                 this.domElement.appendChild(this.pre);
 
                 this.canvas = document.createElement('canvas');
@@ -257,10 +283,11 @@
                 this.domElement.appendChild(this.canvas);
 
                 this.deg = 0;
-                this.invert = invert ?? true;
-                this.fontSize = fontSize ?? 12;
+                this.invert = invert ?? false; // Changed to false for better readability
+                this.fontSize = fontSize ?? 14;
                 this.fontFamily = fontFamily ?? "'Courier New', monospace";
-                this.charset = charset ?? ' .\'`^",:;Il!i~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$';
+                // More readable charset with more density
+                this.charset = '@%#*+=-:. ';
 
                 this.context.webkitImageSmoothingEnabled = false;
                 this.context.mozImageSmoothingEnabled = false;
@@ -296,9 +323,15 @@
                 this.pre.style.left = '0';
                 this.pre.style.top = '0';
                 this.pre.style.zIndex = '9';
-                this.pre.style.backgroundAttachment = 'fixed';
-                this.pre.style.mixBlendMode = 'difference';
                 this.pre.style.pointerEvents = 'none';
+                this.pre.style.color = '#ff69b4';
+                this.pre.style.textShadow = '0 0 10px #ff69b4, 0 0 20px #ff1493, 0 0 40px #ff1493, 0 0 80px #ff1493';
+                this.pre.style.fontWeight = 'bold';
+                this.pre.style.background = 'transparent';
+                this.pre.style.mixBlendMode = 'normal';
+                this.pre.style.webkitTextFillColor = '#ff69b4';
+                this.pre.style.backgroundImage = 'none';
+                this.pre.style.webkitBackgroundClip = 'unset';
             }
 
             render(scene, camera) {
@@ -343,6 +376,8 @@
                                 continue;
                             }
                             let gray = (0.3 * r + 0.6 * g + 0.1 * b) / 255;
+                            // Boost contrast
+                            gray = Math.pow(gray, 0.8);
                             let idx = Math.floor((1 - gray) * (this.charset.length - 1));
                             if (this.invert) idx = this.charset.length - idx - 1;
                             str += this.charset[idx];
@@ -362,21 +397,21 @@
         //  CANVAS TEXT
         // ============================================================
         class CanvasTxt {
-            constructor(txt, { fontSize = 200, fontFamily = 'Arial', color = '#fdf9f3' } = {}) {
+            constructor(txt, { fontSize = 200, fontFamily = 'Arial', color = '#ffffff' } = {}) {
                 this.canvas = document.createElement('canvas');
                 this.context = this.canvas.getContext('2d');
                 this.txt = txt;
                 this.fontSize = fontSize;
                 this.fontFamily = fontFamily;
                 this.color = color;
-                this.font = `600 ${this.fontSize}px ${this.fontFamily}`;
+                this.font = `700 ${this.fontSize}px ${this.fontFamily}`;
             }
 
             resize() {
                 this.context.font = this.font;
                 const metrics = this.context.measureText(this.txt);
-                const textWidth = Math.ceil(metrics.width) + 20;
-                const textHeight = Math.ceil(metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent) + 20;
+                const textWidth = Math.ceil(metrics.width) + 40;
+                const textHeight = Math.ceil(metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent) + 40;
                 this.canvas.width = textWidth;
                 this.canvas.height = textHeight;
             }
@@ -386,8 +421,10 @@
                 this.context.fillStyle = this.color;
                 this.context.font = this.font;
                 const metrics = this.context.measureText(this.txt);
-                const yPos = 10 + metrics.actualBoundingBoxAscent;
-                this.context.fillText(this.txt, 10, yPos);
+                const yPos = 20 + metrics.actualBoundingBoxAscent;
+                this.context.shadowBlur = 20;
+                this.context.shadowColor = '#ff69b4';
+                this.context.fillText(this.txt, 20, yPos);
             }
 
             get width() { return this.canvas.width; }
@@ -420,8 +457,8 @@
 
             async init() {
                 try {
-                    await document.fonts.load('600 200px "IBM Plex Mono"');
-                    await document.fonts.load('500 12px "IBM Plex Mono"');
+                    await document.fonts.load('700 180px "IBM Plex Mono"');
+                    await document.fonts.load('500 14px "IBM Plex Mono"');
                 } catch (e) {}
                 await document.fonts.ready;
 
@@ -474,7 +511,7 @@
                 this.filter = new AsciiFilter(this.renderer, {
                     fontFamily: 'IBM Plex Mono',
                     fontSize: this.asciiFontSize,
-                    invert: true
+                    invert: false
                 });
 
                 this.container.appendChild(this.filter.domElement);
@@ -559,9 +596,9 @@
 
             const app = new CanvAscii({
                 text: 'I love you Tushar',
-                asciiFontSize: 8,
+                asciiFontSize: 14,
                 textFontSize: 160,
-                textColor: '#fdf9f3',
+                textColor: '#ffffff',
                 planeBaseHeight: 8,
                 enableWaves: true
             }, container, width, height);
