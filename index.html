@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title> Tushar </title>
+    <title>Tushar </title>
     <style>
         *,
         *::before,
@@ -14,17 +14,15 @@
         }
 
         :root {
-            --color-primary: #f6aca2;
-            --color-secondary: #f49b90;
-            --color-tertiary: #f28b7d;
-            --color-quaternary: #f07a6a;
-            --color-quinary: #ee6352;
+            --color-primary: #ff69b4;
+            --color-secondary: #ff1493;
+            --color-tertiary: #ff8cba;
+            --color-quaternary: #ffb6c1;
+            --color-quinary: #ff69b4;
         }
 
         body {
             min-height: 100vh;
-            font-weight: 300;
-            font-size: 1.25rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -51,29 +49,33 @@
             justify-content: center;
             position: relative;
             z-index: 1;
+            padding: 20px;
         }
 
         .text-shadows {
-            text-shadow: 3px 3px 0 var(--color-secondary), 
-                         6px 6px 0 var(--color-tertiary),
-                         9px 9px 0 var(--color-quaternary), 
-                         12px 12px 0 var(--color-quinary);
-            font-family: 'Bungee', sans-serif;
-            font-weight: 400;
+            font-family: 'Arial Black', 'Impact', sans-serif;
+            font-weight: 900;
             text-transform: uppercase;
-            font-size: calc(2rem + 5vw);
+            font-size: clamp(2rem, 8vw, 6rem);
             text-align: center;
             margin: 0;
-            color: var(--color-primary);
+            color: #ff69b4;
+            letter-spacing: 0.2rem;
+            text-shadow: 
+                3px 3px 0 #ff1493,
+                6px 6px 0 #ff8cba,
+                9px 9px 0 #ffb6c1,
+                12px 12px 0 #ff69b4;
             animation: shadows 1.2s ease-in infinite;
-            letter-spacing: 0.4rem;
-            /* Pink glow for better visibility */
-            filter: drop-shadow(0 0 20px rgba(255, 105, 180, 0.3));
+            filter: drop-shadow(0 0 30px rgba(255, 105, 180, 0.4));
+            line-height: 1.2;
+            padding: 20px;
         }
 
         @keyframes shadows {
             0% {
                 text-shadow: none;
+                transform: translate(0, 0);
             }
             10% {
                 transform: translate(-3px, -3px);
@@ -81,42 +83,49 @@
             }
             20% {
                 transform: translate(-6px, -6px);
-                text-shadow: 3px 3px 0 var(--color-secondary),
+                text-shadow: 
+                    3px 3px 0 var(--color-secondary),
                     6px 6px 0 var(--color-tertiary);
             }
             30% {
                 transform: translate(-9px, -9px);
-                text-shadow: 3px 3px 0 var(--color-secondary),
-                    6px 6px 0 var(--color-tertiary), 
+                text-shadow: 
+                    3px 3px 0 var(--color-secondary),
+                    6px 6px 0 var(--color-tertiary),
                     9px 9px 0 var(--color-quaternary);
             }
             40% {
                 transform: translate(-12px, -12px);
-                text-shadow: 3px 3px 0 var(--color-secondary),
-                    6px 6px 0 var(--color-tertiary), 
+                text-shadow: 
+                    3px 3px 0 var(--color-secondary),
+                    6px 6px 0 var(--color-tertiary),
                     9px 9px 0 var(--color-quaternary),
                     12px 12px 0 var(--color-quinary);
             }
             50% {
                 transform: translate(-12px, -12px);
-                text-shadow: 3px 3px 0 var(--color-secondary),
-                    6px 6px 0 var(--color-tertiary), 
+                text-shadow: 
+                    3px 3px 0 var(--color-secondary),
+                    6px 6px 0 var(--color-tertiary),
                     9px 9px 0 var(--color-quaternary),
                     12px 12px 0 var(--color-quinary);
             }
             60% {
-                text-shadow: 3px 3px 0 var(--color-secondary),
-                    6px 6px 0 var(--color-tertiary), 
+                text-shadow: 
+                    3px 3px 0 var(--color-secondary),
+                    6px 6px 0 var(--color-tertiary),
                     9px 9px 0 var(--color-quaternary),
                     12px 12px 0 var(--color-quinary);
             }
             70% {
-                text-shadow: 3px 3px 0 var(--color-secondary),
-                    6px 6px 0 var(--color-tertiary), 
+                text-shadow: 
+                    3px 3px 0 var(--color-secondary),
+                    6px 6px 0 var(--color-tertiary),
                     9px 9px 0 var(--color-quaternary);
             }
             80% {
-                text-shadow: 3px 3px 0 var(--color-secondary),
+                text-shadow: 
+                    3px 3px 0 var(--color-secondary),
                     6px 6px 0 var(--color-tertiary);
             }
             90% {
@@ -124,17 +133,17 @@
             }
             100% {
                 text-shadow: none;
+                transform: translate(0, 0);
             }
         }
 
-        /* Subtitle */
         .subtitle {
             color: rgba(255, 105, 180, 0.5);
             font-family: 'Courier New', monospace;
-            font-size: 1rem;
+            font-size: clamp(0.8rem, 1.5vw, 1.2rem);
             position: relative;
             z-index: 1;
-            margin-top: 20px;
+            margin-top: 10px;
             letter-spacing: 8px;
             text-transform: uppercase;
             animation: pulse 2s ease-in-out infinite;
@@ -146,21 +155,44 @@
                 opacity: 0.3;
             }
             50% {
-                opacity: 0.8;
+                opacity: 1;
             }
         }
 
-        /* Load Bungee font */
-        @import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
+        /* Make text glow more */
+        .glow {
+            position: relative;
+            z-index: 1;
+        }
+
+        .glow::after {
+            content: 'I love you Tushar';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            color: transparent;
+            text-shadow: 0 0 40px rgba(255, 105, 180, 0.5), 0 0 80px rgba(255, 20, 147, 0.3);
+            z-index: -1;
+            font-family: 'Arial Black', 'Impact', sans-serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: clamp(2rem, 8vw, 6rem);
+            text-align: center;
+            letter-spacing: 0.2rem;
+            line-height: 1.2;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
     <canvas id="matrixCanvas"></canvas>
 
     <div class="content">
-        <h1 class="text-shadows">I love you Tushar</h1>
+        <h1 class="text-shadows glow">I love you Tushar</h1>
     </div>
-    
+   
 
     <script>
         // ============================================================
@@ -226,7 +258,7 @@
         resize();
         animate();
 
-        console.log(' Tushar ');
+        console.log(' I love you Tushar ');
     </script>
 </body>
 </html>
