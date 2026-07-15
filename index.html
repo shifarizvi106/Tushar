@@ -3,28 +3,38 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tushar</title>
+    <title> Tushar </title>
     <style>
-        * {
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
-        body,
-        html {
-            width: 100%;
-            height: 100%;
+
+        :root {
+            --color-primary: #f6aca2;
+            --color-secondary: #f49b90;
+            --color-tertiary: #f28b7d;
+            --color-quaternary: #f07a6a;
+            --color-quinary: #ee6352;
+        }
+
+        body {
+            min-height: 100vh;
+            font-weight: 300;
+            font-size: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             overflow: hidden;
             background-color: #000;
-            font-family: 'Courier New', monospace;
-        }
-        #container {
             position: relative;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
         }
-        /* Matrix rain canvas */
+
+        /* Matrix Rain Canvas */
         #matrixCanvas {
             position: absolute;
             top: 0;
@@ -34,445 +44,187 @@
             z-index: 0;
             pointer-events: none;
         }
-        /* Fuzzy text canvas */
-        #fuzzyCanvas {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+
+        .content {
+            display: flex;
+            align-content: center;
+            justify-content: center;
+            position: relative;
             z-index: 1;
-            cursor: pointer;
-            pointer-events: auto;
-            max-width: 90vw;
-            max-height: 90vh;
         }
+
+        .text-shadows {
+            text-shadow: 3px 3px 0 var(--color-secondary), 
+                         6px 6px 0 var(--color-tertiary),
+                         9px 9px 0 var(--color-quaternary), 
+                         12px 12px 0 var(--color-quinary);
+            font-family: 'Bungee', sans-serif;
+            font-weight: 400;
+            text-transform: uppercase;
+            font-size: calc(2rem + 5vw);
+            text-align: center;
+            margin: 0;
+            color: var(--color-primary);
+            animation: shadows 1.2s ease-in infinite;
+            letter-spacing: 0.4rem;
+            /* Pink glow for better visibility */
+            filter: drop-shadow(0 0 20px rgba(255, 105, 180, 0.3));
+        }
+
+        @keyframes shadows {
+            0% {
+                text-shadow: none;
+            }
+            10% {
+                transform: translate(-3px, -3px);
+                text-shadow: 3px 3px 0 var(--color-secondary);
+            }
+            20% {
+                transform: translate(-6px, -6px);
+                text-shadow: 3px 3px 0 var(--color-secondary),
+                    6px 6px 0 var(--color-tertiary);
+            }
+            30% {
+                transform: translate(-9px, -9px);
+                text-shadow: 3px 3px 0 var(--color-secondary),
+                    6px 6px 0 var(--color-tertiary), 
+                    9px 9px 0 var(--color-quaternary);
+            }
+            40% {
+                transform: translate(-12px, -12px);
+                text-shadow: 3px 3px 0 var(--color-secondary),
+                    6px 6px 0 var(--color-tertiary), 
+                    9px 9px 0 var(--color-quaternary),
+                    12px 12px 0 var(--color-quinary);
+            }
+            50% {
+                transform: translate(-12px, -12px);
+                text-shadow: 3px 3px 0 var(--color-secondary),
+                    6px 6px 0 var(--color-tertiary), 
+                    9px 9px 0 var(--color-quaternary),
+                    12px 12px 0 var(--color-quinary);
+            }
+            60% {
+                text-shadow: 3px 3px 0 var(--color-secondary),
+                    6px 6px 0 var(--color-tertiary), 
+                    9px 9px 0 var(--color-quaternary),
+                    12px 12px 0 var(--color-quinary);
+            }
+            70% {
+                text-shadow: 3px 3px 0 var(--color-secondary),
+                    6px 6px 0 var(--color-tertiary), 
+                    9px 9px 0 var(--color-quaternary);
+            }
+            80% {
+                text-shadow: 3px 3px 0 var(--color-secondary),
+                    6px 6px 0 var(--color-tertiary);
+            }
+            90% {
+                text-shadow: 3px 3px 0 var(--color-secondary);
+            }
+            100% {
+                text-shadow: none;
+            }
+        }
+
+        /* Subtitle */
+        .subtitle {
+            color: rgba(255, 105, 180, 0.5);
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            position: relative;
+            z-index: 1;
+            margin-top: 20px;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        /* Load Bungee font */
+        @import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
     </style>
 </head>
 <body>
-    <div id="container">
-        <canvas id="matrixCanvas"></canvas>
-        <canvas id="fuzzyCanvas"></canvas>
+    <canvas id="matrixCanvas"></canvas>
+
+    <div class="content">
+        <h1 class="text-shadows">I love you Tushar</h1>
     </div>
+    
 
     <script>
         // ============================================================
         //  MATRIX RAIN (Pink)
         // ============================================================
-        class MatrixRain {
-            constructor(canvas) {
-                this.canvas = canvas;
-                this.ctx = canvas.getContext('2d');
-                this.drops = [];
-                this.characters =
-                    'ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-                this.fontSize = 14;
-                this.speed = 1;
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
 
-                this.resize();
-                window.addEventListener('resize', () => this.resize());
-                this.animate();
-            }
+        let drops = [];
+        const characters = 'ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let fontSize = 14;
+        let speed = 1;
 
-            resize() {
-                const rect = this.canvas.parentElement.getBoundingClientRect();
-                this.canvas.width = rect.width;
-                this.canvas.height = rect.height;
-                const cols = Math.floor(this.canvas.width / this.fontSize);
-                this.drops = [];
-                for (let i = 0; i < cols; i++) {
-                    this.drops[i] = Math.random() * -100;
-                }
-            }
-
-            animate() {
-                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
-                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-                for (let i = 0; i < this.drops.length; i++) {
-                    const char = this.characters[Math.floor(Math.random() * this.characters.length)];
-                    const x = i * this.fontSize;
-                    const y = this.drops[i] * this.fontSize;
-
-                    const gradient = this.ctx.createRadialGradient(x, y, 0, x, y, this.fontSize);
-                    const pink = Math.random();
-                    if (pink > 0.7) {
-                        gradient.addColorStop(0, '#ff1493');
-                        gradient.addColorStop(1, '#ff69b4');
-                    } else if (pink > 0.4) {
-                        gradient.addColorStop(0, '#ff69b4');
-                        gradient.addColorStop(1, '#ff8cba');
-                    } else {
-                        gradient.addColorStop(0, '#ff8cba');
-                        gradient.addColorStop(1, '#ffb6c1');
-                    }
-
-                    this.ctx.fillStyle = gradient;
-                    this.ctx.font = `${this.fontSize}px 'Courier New', monospace`;
-                    this.ctx.shadowBlur = 10;
-                    this.ctx.shadowColor = 'rgba(255, 105, 180, 0.3)';
-                    this.ctx.fillText(char, x, y);
-
-                    if (y > this.canvas.height && Math.random() > 0.975) {
-                        this.drops[i] = 0;
-                    }
-                    this.drops[i] += this.speed + Math.random() * 0.5;
-                }
-
-                requestAnimationFrame(() => this.animate());
-            }
-
-            dispose() {
-                window.removeEventListener('resize', () => this.resize());
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const cols = Math.floor(canvas.width / fontSize);
+            drops = [];
+            for (let i = 0; i < cols; i++) {
+                drops[i] = Math.random() * -100;
             }
         }
 
-        // ============================================================
-        //  FUZZY TEXT COMPONENT
-        // ============================================================
-        class FuzzyText {
-            constructor(canvas, options = {}) {
-                this.canvas = canvas;
-                this.ctx = canvas.getContext('2d');
-                this.options = {
-                    text: 'I love you Tushar',
-                    fontSize: 'clamp(2rem, 10vw, 8rem)',
-                    fontWeight: 900,
-                    fontFamily: "'Courier New', monospace",
-                    color: '#ff69b4',
-                    enableHover: true,
-                    baseIntensity: 0.18,
-                    hoverIntensity: 0.5,
-                    fuzzRange: 30,
-                    fps: 60,
-                    direction: 'horizontal',
-                    transitionDuration: 0,
-                    clickEffect: true,
-                    glitchMode: true,
-                    glitchInterval: 3000,
-                    glitchDuration: 150,
-                    gradient: ['#ff69b4', '#ff1493', '#ff8cba', '#ff69b4'],
-                    letterSpacing: 0,
-                    ...options
-                };
+        function animate() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                this.isCancelled = false;
-                this.glitchTimeoutId = null;
-                this.glitchEndTimeoutId = null;
-                this.clickTimeoutId = null;
-                this.animationFrameId = null;
+            for (let i = 0; i < drops.length; i++) {
+                const char = characters[Math.floor(Math.random() * characters.length)];
+                const x = i * fontSize;
+                const y = drops[i] * fontSize;
 
-                this.init();
+                // Pink gradient for matrix rain
+                const gradient = ctx.createRadialGradient(x, y, 0, x, y, fontSize);
+                const pink = Math.random();
+                if (pink > 0.7) {
+                    gradient.addColorStop(0, '#ff1493');
+                    gradient.addColorStop(1, '#ff69b4');
+                } else if (pink > 0.4) {
+                    gradient.addColorStop(0, '#ff69b4');
+                    gradient.addColorStop(1, '#ff8cba');
+                } else {
+                    gradient.addColorStop(0, '#ff8cba');
+                    gradient.addColorStop(1, '#ffb6c1');
+                }
+
+                ctx.fillStyle = gradient;
+                ctx.font = `${fontSize}px 'Courier New', monospace`;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = 'rgba(255, 105, 180, 0.3)';
+                ctx.fillText(char, x, y);
+
+                if (y > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i] += speed + Math.random() * 0.5;
             }
 
-            async init() {
-                const canvas = this.canvas;
-                const ctx = this.ctx;
-                const opts = this.options;
-
-                if (!ctx) return;
-
-                const fontSizeStr = typeof opts.fontSize === 'number' ? `${opts.fontSize}px` : opts.fontSize;
-                const fontString = `${opts.fontWeight} ${fontSizeStr} ${opts.fontFamily}`;
-
-                try {
-                    await document.fonts.load(fontString);
-                } catch {
-                    await document.fonts.ready;
-                }
-                if (this.isCancelled) return;
-
-                let numericFontSize;
-                if (typeof opts.fontSize === 'number') {
-                    numericFontSize = opts.fontSize;
-                } else {
-                    const temp = document.createElement('span');
-                    temp.style.fontSize = opts.fontSize;
-                    document.body.appendChild(temp);
-                    const computedSize = window.getComputedStyle(temp).fontSize;
-                    numericFontSize = parseFloat(computedSize);
-                    document.body.removeChild(temp);
-                }
-
-                const text = opts.text;
-
-                const offscreen = document.createElement('canvas');
-                const offCtx = offscreen.getContext('2d');
-                if (!offCtx) return;
-
-                offCtx.font = `${opts.fontWeight} ${fontSizeStr} ${opts.fontFamily}`;
-                offCtx.textBaseline = 'alphabetic';
-
-                let totalWidth = 0;
-                if (opts.letterSpacing !== 0) {
-                    for (const char of text) {
-                        totalWidth += offCtx.measureText(char).width + opts.letterSpacing;
-                    }
-                    totalWidth -= opts.letterSpacing;
-                } else {
-                    totalWidth = offCtx.measureText(text).width;
-                }
-
-                const metrics = offCtx.measureText(text);
-                const actualLeft = metrics.actualBoundingBoxLeft ?? 0;
-                const actualRight = opts.letterSpacing !== 0 ? totalWidth : (metrics.actualBoundingBoxRight ?? metrics.width);
-                const actualAscent = metrics.actualBoundingBoxAscent ?? numericFontSize;
-                const actualDescent = metrics.actualBoundingBoxDescent ?? numericFontSize * 0.2;
-
-                const textBoundingWidth = Math.ceil(opts.letterSpacing !== 0 ? totalWidth : actualLeft + actualRight);
-                const tightHeight = Math.ceil(actualAscent + actualDescent);
-
-                const extraWidthBuffer = 10;
-                const offscreenWidth = textBoundingWidth + extraWidthBuffer;
-
-                offscreen.width = offscreenWidth;
-                offscreen.height = tightHeight;
-
-                const xOffset = extraWidthBuffer / 2;
-                offCtx.font = `${opts.fontWeight} ${fontSizeStr} ${opts.fontFamily}`;
-                offCtx.textBaseline = 'alphabetic';
-
-                if (opts.gradient && Array.isArray(opts.gradient) && opts.gradient.length >= 2) {
-                    const grad = offCtx.createLinearGradient(0, 0, offscreenWidth, 0);
-                    opts.gradient.forEach((c, i) => grad.addColorStop(i / (opts.gradient.length - 1), c));
-                    offCtx.fillStyle = grad;
-                } else {
-                    offCtx.fillStyle = opts.color;
-                }
-
-                if (opts.letterSpacing !== 0) {
-                    let xPos = xOffset;
-                    for (const char of text) {
-                        offCtx.fillText(char, xPos, actualAscent);
-                        xPos += offCtx.measureText(char).width + opts.letterSpacing;
-                    }
-                } else {
-                    offCtx.fillText(text, xOffset - actualLeft, actualAscent);
-                }
-
-                const fuzzRange = opts.fuzzRange;
-                const horizontalMargin = fuzzRange + 20;
-                const verticalMargin = 0;
-                canvas.width = offscreenWidth + horizontalMargin * 2;
-                canvas.height = tightHeight + verticalMargin * 2;
-                ctx.translate(horizontalMargin, verticalMargin);
-
-                const interactiveLeft = horizontalMargin + xOffset;
-                const interactiveTop = verticalMargin;
-                const interactiveRight = interactiveLeft + textBoundingWidth;
-                const interactiveBottom = interactiveTop + tightHeight;
-
-                let isHovering = false;
-                let isClicking = false;
-                let isGlitching = false;
-                let currentIntensity = opts.baseIntensity;
-                let targetIntensity = opts.baseIntensity;
-                let lastFrameTime = 0;
-                const frameDuration = 1000 / opts.fps;
-
-                const startGlitchLoop = () => {
-                    if (!opts.glitchMode || this.isCancelled) return;
-                    this.glitchTimeoutId = setTimeout(() => {
-                        if (this.isCancelled) return;
-                        isGlitching = true;
-                        this.glitchEndTimeoutId = setTimeout(() => {
-                            isGlitching = false;
-                            startGlitchLoop();
-                        }, opts.glitchDuration);
-                    }, opts.glitchInterval);
-                };
-
-                if (opts.glitchMode) startGlitchLoop();
-
-                const run = (timestamp) => {
-                    if (this.isCancelled) return;
-
-                    if (timestamp - lastFrameTime < frameDuration) {
-                        this.animationFrameId = window.requestAnimationFrame(run);
-                        return;
-                    }
-                    lastFrameTime = timestamp;
-
-                    ctx.clearRect(
-                        -fuzzRange - 20,
-                        -fuzzRange - 10,
-                        offscreenWidth + 2 * (fuzzRange + 20),
-                        tightHeight + 2 * (fuzzRange + 10)
-                    );
-
-                    if (isClicking) {
-                        targetIntensity = 1;
-                    } else if (isGlitching) {
-                        targetIntensity = 1;
-                    } else if (isHovering) {
-                        targetIntensity = opts.hoverIntensity;
-                    } else {
-                        targetIntensity = opts.baseIntensity;
-                    }
-
-                    if (opts.transitionDuration > 0) {
-                        const step = 1 / (opts.transitionDuration / frameDuration);
-                        if (currentIntensity < targetIntensity) {
-                            currentIntensity = Math.min(currentIntensity + step, targetIntensity);
-                        } else if (currentIntensity > targetIntensity) {
-                            currentIntensity = Math.max(currentIntensity - step, targetIntensity);
-                        }
-                    } else {
-                        currentIntensity = targetIntensity;
-                    }
-
-                    if (opts.direction === 'horizontal') {
-                        for (let j = 0; j < tightHeight; j++) {
-                            const dx = Math.floor(currentIntensity * (Math.random() - 0.5) * fuzzRange);
-                            ctx.drawImage(offscreen, 0, j, offscreenWidth, 1, dx, j, offscreenWidth, 1);
-                        }
-                    } else if (opts.direction === 'vertical') {
-                        for (let i = 0; i < offscreenWidth; i++) {
-                            const dy = Math.floor(currentIntensity * (Math.random() - 0.5) * fuzzRange);
-                            ctx.drawImage(offscreen, i, 0, 1, tightHeight, i, dy, 1, tightHeight);
-                        }
-                    } else {
-                        for (let j = 0; j < tightHeight; j++) {
-                            const dx = Math.floor(currentIntensity * (Math.random() - 0.5) * fuzzRange);
-                            ctx.drawImage(offscreen, 0, j, offscreenWidth, 1, dx, j, offscreenWidth, 1);
-                        }
-                        const tempData = ctx.getImageData(0, 0, offscreenWidth + fuzzRange, tightHeight + fuzzRange);
-                        ctx.clearRect(
-                            -fuzzRange - 20,
-                            -fuzzRange - 10,
-                            offscreenWidth + 2 * (fuzzRange + 20),
-                            tightHeight + 2 * (fuzzRange + 10)
-                        );
-                        ctx.putImageData(tempData, 0, 0);
-                        for (let i = 0; i < offscreenWidth + fuzzRange; i++) {
-                            const dy = Math.floor(currentIntensity * (Math.random() - 0.5) * fuzzRange * 0.5);
-                            const colData = ctx.getImageData(i, 0, 1, tightHeight + fuzzRange);
-                            ctx.clearRect(i, -fuzzRange, 1, tightHeight + 2 * fuzzRange);
-                            ctx.putImageData(colData, i, dy);
-                        }
-                    }
-                    this.animationFrameId = window.requestAnimationFrame(run);
-                };
-
-                this.animationFrameId = window.requestAnimationFrame(run);
-
-                const isInsideTextArea = (x, y) => {
-                    return x >= interactiveLeft && x <= interactiveRight && y >= interactiveTop && y <= interactiveBottom;
-                };
-
-                const handleMouseMove = (e) => {
-                    if (!opts.enableHover) return;
-                    const rect = canvas.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    isHovering = isInsideTextArea(x, y);
-                    canvas.style.cursor = isHovering ? 'pointer' : 'default';
-                };
-
-                const handleMouseLeave = () => {
-                    isHovering = false;
-                    canvas.style.cursor = 'default';
-                };
-
-                const handleClick = () => {
-                    if (!opts.clickEffect) return;
-                    isClicking = true;
-                    clearTimeout(this.clickTimeoutId);
-                    this.clickTimeoutId = setTimeout(() => {
-                        isClicking = false;
-                    }, 150);
-                };
-
-                const handleTouchMove = (e) => {
-                    if (!opts.enableHover) return;
-                    e.preventDefault();
-                    const rect = canvas.getBoundingClientRect();
-                    const touch = e.touches[0];
-                    const x = touch.clientX - rect.left;
-                    const y = touch.clientY - rect.top;
-                    isHovering = isInsideTextArea(x, y);
-                };
-
-                const handleTouchEnd = () => {
-                    isHovering = false;
-                };
-
-                if (opts.enableHover) {
-                    canvas.addEventListener('mousemove', handleMouseMove);
-                    canvas.addEventListener('mouseleave', handleMouseLeave);
-                    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
-                    canvas.addEventListener('touchend', handleTouchEnd);
-                }
-
-                if (opts.clickEffect) {
-                    canvas.addEventListener('click', handleClick);
-                }
-
-                this.cleanup = () => {
-                    this.isCancelled = true;
-                    window.cancelAnimationFrame(this.animationFrameId);
-                    clearTimeout(this.glitchTimeoutId);
-                    clearTimeout(this.glitchEndTimeoutId);
-                    clearTimeout(this.clickTimeoutId);
-                    if (opts.enableHover) {
-                        canvas.removeEventListener('mousemove', handleMouseMove);
-                        canvas.removeEventListener('mouseleave', handleMouseLeave);
-                        canvas.removeEventListener('touchmove', handleTouchMove);
-                        canvas.removeEventListener('touchend', handleTouchEnd);
-                    }
-                    if (opts.clickEffect) {
-                        canvas.removeEventListener('click', handleClick);
-                    }
-                };
-            }
+            requestAnimationFrame(animate);
         }
 
-        // ============================================================
-        //  BOOT
-        // ============================================================
-        const container = document.getElementById('container');
-        const matrixCanvas = document.getElementById('matrixCanvas');
-        const fuzzyCanvas = document.getElementById('fuzzyCanvas');
-
-        // Initialize Matrix Rain
-        const matrixRain = new MatrixRain(matrixCanvas);
-
-        // Initialize Fuzzy Text
-        const fuzzyText = new FuzzyText(fuzzyCanvas, {
-            text: 'I love you Tushar',
-            fontSize: 'clamp(2rem, 8vw, 6rem)',
-            fontWeight: 900,
-            fontFamily: "'Courier New', monospace",
-            color: '#ff69b4',
-            enableHover: true,
-            baseIntensity: 0.15,
-            hoverIntensity: 0.6,
-            fuzzRange: 25,
-            fps: 60,
-            direction: 'both',
-            transitionDuration: 0.5,
-            clickEffect: true,
-            glitchMode: true,
-            glitchInterval: 3000,
-            glitchDuration: 150,
-            gradient: ['#ff69b4', '#ff1493', '#ff8cba', '#ff69b4'],
-            letterSpacing: 2
-        });
-
-        // Handle window resize for fuzzy text
-        const resizeFuzzy = () => {
-            // The fuzzy text handles its own resize on init
-            // We'll just re-trigger if needed
-        };
-
-        window.addEventListener('resize', resizeFuzzy);
-
-        // Cleanup on page unload
-        window.addEventListener('beforeunload', () => {
-            matrixRain.dispose();
-            if (fuzzyText.cleanup) {
-                fuzzyText.cleanup();
-            }
-        });
+        window.addEventListener('resize', resize);
+        resize();
+        animate();
 
         console.log(' Tushar ');
     </script>
